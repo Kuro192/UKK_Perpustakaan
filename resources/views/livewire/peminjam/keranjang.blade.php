@@ -19,7 +19,11 @@
 
     <div class="row">
         <div class="col-md-12 mb-2">
-            <button wire:click="pinjam({{ $keranjang->id }})" class="btn btn-sm btn-success">Pinjam</button>
+            @if ($keranjang->tanggal_pinjam && $keranjang->tanggal_pinjam != '01-Jan-2024')
+                <strong>Tanggal Pinjam : {{ $keranjang->tanggal_pinjam }}</strong>
+            @else
+                <button wire:click="pinjam({{ $keranjang->id }})" class="btn btn-sm btn-success">Pinjam</button>
+            @endif
             <strong class="float-right">Kode Pinjam : {{ $keranjang->kode_pinjam }}</strong>
         </div>
     </div>
@@ -34,7 +38,7 @@
                         <th>Penulis</th>
                         <th>Rak</th>
                         <th>Baris</th>
-                        @if (!$keranjang->tanggal_pinjam)
+                        @if ($keranjang->tanggal_pinjam && $keranjang->tanggal_pinjam != '01-Jan-2024')
                             <th></th>
                         @endif
                     </tr>
@@ -48,7 +52,9 @@
                             <td>{{ $item->buku->rak->rak }}</td>
                             <td>{{ $item->buku->rak->baris }}</td>
                             <td>
-                                @if ($keranjang->tanggal_pinjam && $keranjang->tanggal_pinjam != '01-Jan-2023')
+                                @if ($keranjang->tanggal_pinjam && $keranjang->tanggal_pinjam != '01-Jan-2024')
+
+                                @else
                                     <button wire:click="hapus({{ $keranjang->id }}, {{ $item->id }})"
                                         class="btn btn-sm btn-danger">Hapus</button>
                                 @endif
@@ -57,7 +63,9 @@
                     @endforeach
                 </tbody>
             </table>
-            @if ($keranjang->tanggal_pinjam && $keranjang->tanggal_pinjam != '01-Jan-2023')
+            @if ($keranjang->tanggal_pinjam && $keranjang->tanggal_pinjam != '01-Jan-2024')
+
+            @else
                 <button wire:click="hapusMasal" class="btn btn-sm btn-danger">Hapus Masal</button>
             @endif
         </div>
