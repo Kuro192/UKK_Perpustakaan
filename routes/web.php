@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CekRoleController;
 use App\Http\Controllers\Peminjam\BukuController as PeminjamBukuController;
 use App\Http\Controllers\Peminjam\KeranjangController;
+use App\Http\Controllers\Peminjam\KoleksiController;
 use App\Http\Controllers\Petugas\BukuController;
 use App\Http\Controllers\Petugas\ChartController;
 use App\Http\Controllers\Petugas\DashboardController;
@@ -38,6 +39,7 @@ Route::middleware(['auth'])->group(function () {
     // role peminjam
     Route::middleware(['role:peminjam'])->group(function () {
         Route::get('/keranjang', KeranjangController::class);
+        Route::get('/koleksi', KoleksiController::class);
     });
 
     // role admin

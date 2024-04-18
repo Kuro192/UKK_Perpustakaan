@@ -1,5 +1,5 @@
 <footer class="main-footer">
     <div class="row justify-content-center">
-      <strong>Copyright &copy; Dzaki M.A 2024</strong>
+      <strong>Copyright &copy; E-Library 2024</strong>
     </div>
 </footer>

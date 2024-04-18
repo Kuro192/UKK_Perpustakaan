@@ -66,7 +66,7 @@
                     </tr>
                   </tbody>
                 </table>
-
+                <button wire:click="koleksi({{$buku->id}})" class="btn btn-success">Koleksi</button>
                 <button wire:click="keranjang({{$buku->id}})" class="btn btn-success">Keranjang</button>
             </div>
         </div>

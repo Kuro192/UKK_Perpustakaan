@@ -6,9 +6,11 @@ use App\Models\Buku as ModelsBuku;
 use App\Models\DetailPeminjaman;
 use App\Models\Kategori;
 use App\Models\Peminjaman;
+use App\Models\KoleksiPribadi;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class Buku extends Component
 {
@@ -17,7 +19,7 @@ class Buku extends Component
 
     protected $listeners = ['pilihKategori', 'semuaKategori'];
 
-    public $kategori_id, $pilih_kategori, $buku_id, $detail_buku, $search;
+    public $kategori_id, $pilih_kategori, $buku_id, $detail_buku, $search, $koleksiPribadi;
 
     public function pilihKategori($id)
     {
@@ -45,10 +47,10 @@ class Buku extends Component
     {
         // user harus login
         if (auth()->user()) {
-            
+
             // role peminjam
             if (auth()->user()->hasRole('peminjam')) {
-               
+
                 $peminjaman_lama = DB::table('peminjaman')
                     ->join('detail_peminjaman', 'peminjaman.id', '=', 'detail_peminjaman.peminjaman_id')
                     ->where('peminjam_id', auth()->user()->id)
@@ -103,7 +105,50 @@ class Buku extends Component
             session()->flash('gagal', 'Anda harus login terlebih dahulu');
             redirect('/login');
         }
-        
+
+    }
+
+    public function koleksi()
+    {
+        // Pastikan pengguna sudah login
+        if (auth()->check()) {
+
+            // Pastikan pengguna memiliki peran peminjam
+            if (auth()->user()->hasRole('peminjam')) {
+
+                // Periksa apakah jumlah koleksi sudah mencapai batas 10
+                $totalKoleksi = KoleksiPribadi::where('user_id', auth()->id())->count();
+                if ($totalKoleksi >= 10) {
+                    session()->flash('gagal', 'Anda tidak dapat mengkoleksi lebih dari 10 buku');
+                    return;
+                }
+
+                // Periksa apakah buku sudah ada dalam koleksi pengguna
+                $existingCollection = KoleksiPribadi::where('user_id', auth()->id())
+                                                    ->where('buku_id', $this->buku_id)
+                                                    ->first();
+                if ($existingCollection) {
+                    session()->flash('gagal', 'Anda sudah mengkoleksi buku ini sebelumnya');
+                    return;
+                }
+
+                // Tambahkan buku ke koleksi pribadi
+                KoleksiPribadi::create([
+                    'user_id' => auth()->id(),
+                    'buku_id' => $this->buku_id,
+                    'status_pinjam' => 'tersedia' // Sesuaikan status pinjam sesuai kebutuhan
+                ]);
+
+                session()->flash('sukses', 'Buku berhasil ditambahkan ke koleksi pribadi');
+
+            } else {
+                session()->flash('gagal', 'Role user anda bukan peminjam');
+            }
+
+        } else {
+            session()->flash('gagal', 'Anda harus login terlebih dahulu');
+            return redirect('/login');
+        }
     }
 
     public function updatingSearch()
@@ -131,7 +176,7 @@ class Buku extends Component
             }
             $title = 'Semua Buku';
         }
-        
+
         return view('livewire.peminjam.buku', compact('buku', 'title'));
     }
 
